@@ -356,6 +356,7 @@ def main(args):
 
     print(f"Start training for {args.epochs} epochs")
     start_time = time.time()
+    scalar = torch.cuda.amp.GradScaler() if torch.cuda.is_bf16_supported() else None
     
     for epoch in range(args.start_epoch, args.epochs):
         if args.distributed:
@@ -366,11 +367,12 @@ def main(args):
             optimizer, device, epoch, loss_scaler,
             args.clip_grad, args.clip_mode, model_ema, mixup_fn,
             set_training_mode=args.finetune == '',  # keep in eval mode during finetuning
+            scalar=scalar
         )
 
         lr_scheduler.step(epoch)
 
-        test_stats = evaluate(data_loader_val, model, device)
+        test_stats = evaluate(data_loader_val, model, device, scalar=scalar)
         print(f"Accuracy of the network on the {len(dataset_val)} test images: {test_stats['acc1']:.1f}%")
 
         checkpoint_paths = [output_dir / 'checkpoint.pth']
