@@ -409,8 +409,8 @@ def main(args):
     # predict and plot ROC
     print('*******************STARTING PREDICT*******************')
     predict_single_image(model_without_ddp, device)
-    Predictor(model_without_ddp, data_loader_val, checkpoint_path, device)
-    Plot_ROC(model_without_ddp, data_loader_val, checkpoint_path, device)
+    Predictor(model_without_ddp, data_loader_val, args.resume, device)
+    Plot_ROC(model_without_ddp, data_loader_val, args.resume, device)
 
 
 if __name__ == '__main__':
